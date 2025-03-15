@@ -10,8 +10,8 @@ defmodule FoldingInElixir.Market.Fruit do
   end
 
   @doc false
-  def changeset(picture, attrs) do
-    picture
+  def changeset(fruit, attrs) do
+    fruit
     |> cast(attrs, [:name, :quantity, :price, :total])
     |> validate_required([:name, :quantity, :price, :total])
   end
