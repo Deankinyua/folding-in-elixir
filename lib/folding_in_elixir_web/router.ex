@@ -20,6 +20,7 @@ defmodule FoldingInElixirWeb.Router do
     get "/", PageController, :home
 
     live "/fruits", FruitsLive.Index, :index
+    live "/fruits/new", FruitsLive.Index, :new
   end
 
   # Other scopes may use custom stacks.

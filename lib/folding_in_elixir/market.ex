@@ -1,4 +1,4 @@
-defmodule FoldingInElixir.Records do
+defmodule FoldingInElixir.Market do
   @moduledoc """
   The Market context.
   """

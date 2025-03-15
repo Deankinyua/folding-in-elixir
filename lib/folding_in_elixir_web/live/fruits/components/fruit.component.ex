@@ -1,4 +1,4 @@
-defmodule FoldingInElixirWeb.InvoiceLive.ItemComponent do
+defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
   use FoldingInElixirWeb, :live_component
 
   alias FoldingInElixir.{Helpers}

@@ -9,12 +9,13 @@ module.exports = {
   darkMode: "class",
   content: [
     "./js/**/*.js",
-    "../lib/invoice_generator_web.ex",
-    "../lib/invoice_generator_web/**/*.*ex",
+    "../lib/folding_in_elixir_web.ex",
+    "../lib/folding_in_elixir_web/**/*.*ex",
 
     "../deps/tremorx/lib/components/**/*.ex",
     "../deps/tremorx/lib/js/*.js",
   ],
+
   theme: {
     extend: {
       colors: {
