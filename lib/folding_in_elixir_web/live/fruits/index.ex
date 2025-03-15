@@ -8,7 +8,9 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div></div>
+    <div>
+      List of Customers and the fruits they bought
+    </div>
     """
   end
 
