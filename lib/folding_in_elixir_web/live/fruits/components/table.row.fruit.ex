@@ -21,13 +21,10 @@ defmodule FoldingInElixirWeb.FruitsLive.RowComponent do
             </.link>
           </Button.button>
           <Button.button>
-            <.link
-              phx-click={
-                JS.push("delete", value: %{dom_id: @dom_id, customer_id: @customer.id})
-                |> hide("##{@dom_id}")
-              }
-              data-confirm="Are you sure?"
-            >
+            <.link phx-click={
+              JS.push("delete", value: %{dom_id: @dom_id, customer_id: @customer.id})
+              |> hide("##{@dom_id}")
+            }>
               Delete
             </.link>
           </Button.button>

@@ -21,6 +21,7 @@ defmodule FoldingInElixirWeb.Router do
 
     live "/fruits", FruitsLive.Index, :index
     live "/fruits/new", FruitsLive.Index, :new
+    live "/fruits/:id", FruitsLive.Show, :show
   end
 
   # Other scopes may use custom stacks.

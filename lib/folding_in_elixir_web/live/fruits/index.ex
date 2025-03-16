@@ -1,6 +1,6 @@
 defmodule FoldingInElixirWeb.FruitsLive.Index do
   @moduledoc """
-  Renders Fruits.
+  Renders Customers.
   """
 
   use FoldingInElixirWeb, :live_view
@@ -48,51 +48,50 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
             <Text.subtitle color="black" class="text-2xl font-semibold py-6">
               There is nothing here.
             </Text.subtitle>
-            <Text.text>Create a customer and their fruits. Get started by clicking the</Text.text>
-            <Text.text>New button</Text.text>
+            <Text.text>Create a customer and their fruits. Get started by clicking</Text.text>
+            <Text.text>New Customer</Text.text>
           </Layout.flex>
-        <% else %>
-          <Table.table class="w-full">
-            <Table.table_head class="rounded-t-md border-b-[1px]">
-              <Table.table_row class="hover:bg-tremor-background-muted dark:hover:bg-dark-tremor-background-muted">
-                <Table.table_cell>
-                  <Text.text class="font-semibold text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
-                    Customer Name
-                  </Text.text>
-                </Table.table_cell>
-
-                <Table.table_cell>
-                  <Text.text class="font-semibold text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis text-center">
-                    Actions
-                  </Text.text>
-                </Table.table_cell>
-              </Table.table_row>
-            </Table.table_head>
-
-            <Table.table_body
-              id="table_stream_customers"
-              phx-update="stream"
-              class="divide-y overflow-y-auto"
-            >
-              <Table.table_row
-                :for={{dom_id, customer} <- @streams.customers}
-                id={"#{dom_id}"}
-                class="group hover:bg-tremor-background-muted dark:hover:bg-dark-tremor-background-muted"
-              >
-                <.live_component
-                  module={FoldingInElixirWeb.FruitsLive.RowComponent}
-                  id={dom_id}
-                  customer={customer}
-                  dom_id={dom_id}
-                >
-                  <Table.table_cell>
-                    {customer.name}
-                  </Table.table_cell>
-                </.live_component>
-              </Table.table_row>
-            </Table.table_body>
-          </Table.table>
         <% end %>
+        <Table.table class="w-full">
+          <Table.table_head class="rounded-t-md border-b-[1px]">
+            <Table.table_row class="hover:bg-tremor-background-muted dark:hover:bg-dark-tremor-background-muted">
+              <Table.table_cell>
+                <Text.text class="font-semibold text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
+                  Customer Name
+                </Text.text>
+              </Table.table_cell>
+
+              <Table.table_cell>
+                <Text.text class="font-semibold text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis text-center">
+                  Actions
+                </Text.text>
+              </Table.table_cell>
+            </Table.table_row>
+          </Table.table_head>
+
+          <Table.table_body
+            id="table_stream_customers"
+            phx-update="stream"
+            class="divide-y overflow-y-auto"
+          >
+            <Table.table_row
+              :for={{dom_id, customer} <- @streams.customers}
+              id={dom_id}
+              class="group hover:bg-tremor-background-muted dark:hover:bg-dark-tremor-background-muted"
+            >
+              <.live_component
+                module={FoldingInElixirWeb.FruitsLive.RowComponent}
+                id={dom_id}
+                customer={customer}
+                dom_id={dom_id}
+              >
+                <Table.table_cell>
+                  {customer.name}
+                </Table.table_cell>
+              </.live_component>
+            </Table.table_row>
+          </Table.table_body>
+        </Table.table>
 
         <.modal
           :if={@live_action in [:new, :edit]}
@@ -182,6 +181,15 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
   @impl true
   def handle_params(params, _url, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  @impl true
+  def handle_event("delete", %{"customer_id" => id}, socket) do
+    customer = Repo.get!(Customer, id)
+
+    Repo.delete(customer)
+
+    {:noreply, stream_delete(socket, :customers, customer)}
   end
 
   defp apply_action(socket, :edit, _params) do

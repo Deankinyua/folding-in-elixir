@@ -12,6 +12,8 @@ defmodule FoldingInElixir.Market do
     Repo.all(Customer)
   end
 
+  def get_customer(id), do: Repo.get!(Customer, id)
+
   def change_customer(%Customer{} = customer, attrs \\ %{}) do
     Customer.changeset(customer, attrs)
   end
