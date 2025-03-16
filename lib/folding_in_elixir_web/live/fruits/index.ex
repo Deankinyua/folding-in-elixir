@@ -5,6 +5,10 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
 
   use FoldingInElixirWeb, :live_view
 
+  alias FoldingInElixir.{Repo, Market}
+
+  alias FoldingInElixir.Market.Customer
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -75,6 +79,79 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    customers = Repo.all(Customer)
+
+    dbg(customers)
+
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_info({:valid_name, name_details}, socket) do
+    {:noreply,
+     socket
+     |> assign(name_details: name_details)}
+  end
+
+  @impl true
+  def handle_info({:valid_fruit_details, fruit_details}, socket) do
+    fruit_details = delete_errors_key(fruit_details)
+
+    case Map.get(socket.assigns, :name_details) do
+      nil ->
+        {:noreply, socket}
+
+      name_details ->
+        fruit_details = %{
+          fruits: fruit_details
+        }
+
+        complete_customer_data = Map.merge(name_details, fruit_details)
+
+        customer_changeset = Market.change_customer(%Customer{}, complete_customer_data)
+
+        case Repo.insert(customer_changeset) do
+          {:ok, _record} ->
+            {:noreply,
+             socket
+             |> push_patch(to: ~p"/fruits")
+             |> put_flash(:info, "Customer was Successfully added")}
+
+          {:error, _changeset} ->
+            {:noreply,
+             socket
+             |> push_patch(to: ~p"/fruits")
+             |> put_flash(:error, "Customer Details were not Submitted!!")}
+        end
+    end
+  end
+
+  @impl true
+  def handle_params(params, _url, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :edit, _params) do
+    socket
+    |> assign(:page_title, "Edit Customer")
+  end
+
+  defp apply_action(socket, :new, _params) do
+    socket
+    |> assign(:page_title, "New Customer")
+  end
+
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Listing Customers")
+  end
+
+  defp delete_errors_key(fruit_details) do
+    fruit_details =
+      Enum.map(fruit_details, fn map ->
+        Map.delete(map, :errors)
+      end)
+
+    fruit_details
   end
 end

@@ -8,64 +8,47 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
     ~H"""
     <section>
       <Layout.col>
-        <p class="text-red-400">{@item_error}</p>
+        <p class="text-red-400">{@fruit_error}</p>
         <.form for={@form} phx-target={@myself} phx-change="validate" phx-submit="save">
           <div>
-            <%= for item <- @items do %>
-              <div class={show_errors_on_item_field(item.id, @list_of_submitted_params)}>
-                <p class="text-red-400">This item field contains errors</p>
-              </div>
-              <Layout.col class="space-y-1.5">
-                <label for="name_field">
-                  <Text.text class="text-tremor-content">
-                    Item Name
-                  </Text.text>
-                </label>
-
-                <.input field={@form[item.name]} type="text" placeholder="Item Name..." />
-              </Layout.col>
-
-              <Layout.col class="space-y-1.5">
-                <label for="name_field">
-                  <Text.text class="text-tremor-content">
-                    Quantity
-                  </Text.text>
-                </label>
-
-                <.input field={@form[item.quantity]} type="number" placeholder="Quantity..." />
-              </Layout.col>
-
-              <Layout.col class="space-y-1.5">
-                <label for="name_field">
-                  <Text.text class="text-tremor-content">
-                    Price
-                  </Text.text>
-                </label>
-
-                <.input field={@form[item.price]} type="number" placeholder="Price..." />
-              </Layout.col>
-
-              <Layout.col class="space-y-1.5">
-                <label for="name_field">
-                  <Text.text class="text-tremor-content">
-                    Total
-                  </Text.text>
-                </label>
-
-                <.input field={@form[item.total]} type="text" readonly placeholder="Total..." />
-              </Layout.col>
-
-              <div class={show_remove_item_button(item.id, @item_count)}>
-                <Button.button
-                  variant="secondary"
-                  size="xs"
-                  class="mt-2 w-min"
-                  phx-click={JS.push("remove_item", value: %{id: item.id})}
-                  phx-target={@myself}
-                >
-                  Remove Item
-                </Button.button>
-              </div>
+            <%= for fruit <- @fruits do %>
+              <Layout.flex
+                flex_direction="row"
+                align_items="start"
+                justify_content="between"
+                class="gap-6"
+              >
+                <Layout.col class="space-y-1.5">
+                  <div class={show_errors_on_fruit_field(fruit.id, @list_of_submitted_params)}>
+                    <p class="text-red-400">This fruit's fields contains errors</p>
+                  </div>
+                </Layout.col>
+                <Layout.col class="space-y-1.5">
+                  <.input field={@form[fruit.name]} type="text" placeholder="Fruit Name..." />
+                </Layout.col>
+                <Layout.col class="space-y-1.5">
+                  <.input field={@form[fruit.quantity]} type="number" placeholder="Quantity..." />
+                </Layout.col>
+                <Layout.col class="space-y-1.5">
+                  <.input field={@form[fruit.price]} type="number" placeholder="Price..." />
+                </Layout.col>
+                <Layout.col class="space-y-1.5">
+                  <.input field={@form[fruit.total]} type="text" readonly placeholder="Total..." />
+                </Layout.col>
+                <Layout.col class="space-y-1.5">
+                  <div class={show_remove_fruit_button(fruit.id, @fruit_count)}>
+                    <Button.button
+                      variant="secondary"
+                      size="xl"
+                      class="mt-2 w-min"
+                      phx-click={JS.push("remove_fruit", value: %{id: fruit.id})}
+                      phx-target={@myself}
+                    >
+                      Remove Fruit
+                    </Button.button>
+                  </div>
+                </Layout.col>
+              </Layout.flex>
             <% end %>
           </div>
 
@@ -73,10 +56,10 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
             variant="secondary"
             size="xl"
             class="mt-2 w-min"
-            phx-click={JS.push("add_new_item")}
+            phx-click={JS.push("add_new_fruit")}
             phx-target={@myself}
           >
-            Add new item
+            New Fruit
           </Button.button>
 
           <Button.button type="submit" size="xl" class="mt-2 w-min" phx-disable-with="Saving...">
@@ -93,28 +76,28 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:items, [])
-     |> assign(item_count: 0)
+     |> assign(:fruits, [])
+     |> assign(fruit_count: 0)
      |> assign(list_of_submitted_params: [])
-     |> assign(item_error: "")
+     |> assign(fruit_error: "")
      |> assign_form()}
   end
 
   @impl true
-  def handle_event("validate", %{"items" => item_params}, socket) do
+  def handle_event("validate", %{"fruits" => fruit_params}, socket) do
     # * the main purpose of whatever is here is to offer feedback to the user
-    item_count = socket.assigns.item_count
+    fruit_count = socket.assigns.fruit_count
 
-    item_params = remove_unused_fields(item_params)
+    fruit_params = remove_unused_fields(fruit_params)
 
-    item_params = Helpers.get_totals(item_params, item_count)
+    fruit_params = Helpers.get_totals(fruit_params, fruit_count)
 
-    form = to_form(item_params, as: "items")
+    form = to_form(fruit_params, as: "fruits")
 
     {:noreply,
      socket
      |> assign(form: form)
-     |> assign(item_error: "")}
+     |> assign(fruit_error: "")}
   end
 
   def handle_event("save", params, socket) do
@@ -122,16 +105,16 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
       true ->
         {:noreply,
          socket
-         |> assign(item_error: "Please add at least one item!")}
+         |> assign(fruit_error: "Please add at least one fruit!")}
 
       false ->
-        %{"items" => item_params} = params
-        count = socket.assigns.item_count
-        list_of_item_params = Helpers.get_list_of_params(item_params, count)
+        %{"fruits" => fruit_params} = params
+        count = socket.assigns.fruit_count
+        list_of_fruit_params = Helpers.get_list_of_params(fruit_params, count)
 
-        case Enum.find(list_of_item_params, fn x -> x.errors == true end) do
+        case Enum.find(list_of_fruit_params, fn x -> x.errors == true end) do
           nil ->
-            send(self(), {:valid_item_details, list_of_item_params})
+            send(self(), {:valid_fruit_details, list_of_fruit_params})
 
             {:noreply,
              socket
@@ -140,16 +123,16 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
           _map ->
             {:noreply,
              socket
-             |> assign(list_of_submitted_params: list_of_item_params)}
+             |> assign(list_of_submitted_params: list_of_fruit_params)}
         end
     end
   end
 
   @impl true
-  def handle_event("add_new_item", _params, socket) do
-    items = socket.assigns.items
+  def handle_event("add_new_fruit", _params, socket) do
+    fruits = socket.assigns.fruits
 
-    count = socket.assigns.item_count
+    count = socket.assigns.fruit_count
 
     new_count = count + 1
 
@@ -158,7 +141,7 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
     price = "product_" <> Integer.to_string(new_count) <> "_price"
     total = "product_" <> Integer.to_string(new_count) <> "_total"
 
-    new_item = %{
+    new_fruit = %{
       id: new_count,
       name: String.to_atom(name),
       quantity: String.to_atom(quantity),
@@ -166,40 +149,40 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
       total: String.to_atom(total)
     }
 
-    # to append the new_item into our list
-    new_items = items ++ [new_item]
+    # to append the new_fruit into our list
+    new_fruits = fruits ++ [new_fruit]
 
     {
       :noreply,
       socket
-      |> assign(item_count: new_count)
-      |> assign(:items, new_items)
+      |> assign(fruit_count: new_count)
+      |> assign(:fruits, new_fruits)
     }
   end
 
   @impl true
-  def handle_event("remove_item", %{"id" => id}, socket) do
-    items = socket.assigns.items
+  def handle_event("remove_fruit", %{"id" => id}, socket) do
+    fruits = socket.assigns.fruits
 
-    count = socket.assigns.item_count
+    count = socket.assigns.fruit_count
 
     new_count = count - 1
 
-    item =
-      Enum.filter(items, fn x -> x.id == id end)
+    fruit =
+      Enum.filter(fruits, fn x -> x.id == id end)
       |> Enum.at(0)
 
-    new_items =
-      Enum.filter(items, fn x -> x != item end)
+    new_fruits =
+      Enum.filter(fruits, fn x -> x != fruit end)
 
     {:noreply,
      socket
-     |> assign(item_count: new_count)
-     |> assign(items: new_items)}
+     |> assign(fruit_count: new_count)
+     |> assign(fruits: new_fruits)}
   end
 
   defp assign_form(socket) do
-    form = to_form(%{}, as: "items")
+    form = to_form(%{}, as: "fruits")
 
     assign(socket, :form, form)
   end
@@ -219,7 +202,7 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
     map_of_products
   end
 
-  defp show_remove_item_button(id, count) do
+  defp show_remove_fruit_button(id, count) do
     if id == count do
       "block"
     else
@@ -227,18 +210,18 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
     end
   end
 
-  defp show_errors_on_item_field(id, list_of_params) do
-    item_index = id - 1
+  defp show_errors_on_fruit_field(id, list_of_params) do
+    fruit_index = id - 1
 
     if list_of_params == [] do
       "hidden"
     else
-      case Enum.at(list_of_params, item_index) do
+      case Enum.at(list_of_params, fruit_index) do
         nil ->
           "hidden"
 
-        item_map ->
-          if item_map.errors == true do
+        fruit_map ->
+          if fruit_map.errors == true do
             "block"
           else
             "hidden"
