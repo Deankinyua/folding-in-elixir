@@ -10,7 +10,7 @@ defmodule FoldingInElixir.Market.Customer do
 
     timestamps(type: :utc_datetime)
 
-    embeds_many :fruits, FoldingInElixir.Market.Fruit
+    embeds_many :fruits, FoldingInElixir.Market.Fruit, on_replace: :delete
   end
 
   def changeset(customer, attrs) do

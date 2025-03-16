@@ -43,13 +43,56 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
           </Layout.flex>
         </Layout.flex>
 
-        <Layout.flex flex_direction="col" justify_content="center">
-          <Text.subtitle color="black" class="text-2xl font-semibold py-6">
-            There is nothing here.
-          </Text.subtitle>
-          <Text.text>Create a customer and their fruits. Get started by clicking the</Text.text>
-          <Text.text>New button</Text.text>
-        </Layout.flex>
+        <%= if  @streams.customers.inserts == [] do %>
+          <Layout.flex flex_direction="col" justify_content="center">
+            <Text.subtitle color="black" class="text-2xl font-semibold py-6">
+              There is nothing here.
+            </Text.subtitle>
+            <Text.text>Create a customer and their fruits. Get started by clicking the</Text.text>
+            <Text.text>New button</Text.text>
+          </Layout.flex>
+        <% else %>
+          <Table.table class="w-full">
+            <Table.table_head class="rounded-t-md border-b-[1px]">
+              <Table.table_row class="hover:bg-tremor-background-muted dark:hover:bg-dark-tremor-background-muted">
+                <Table.table_cell>
+                  <Text.text class="font-semibold text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
+                    Customer Name
+                  </Text.text>
+                </Table.table_cell>
+
+                <Table.table_cell>
+                  <Text.text class="font-semibold text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis text-center">
+                    Actions
+                  </Text.text>
+                </Table.table_cell>
+              </Table.table_row>
+            </Table.table_head>
+
+            <Table.table_body
+              id="table_stream_customers"
+              phx-update="stream"
+              class="divide-y overflow-y-auto"
+            >
+              <Table.table_row
+                :for={{dom_id, customer} <- @streams.customers}
+                id={"#{dom_id}"}
+                class="group hover:bg-tremor-background-muted dark:hover:bg-dark-tremor-background-muted"
+              >
+                <.live_component
+                  module={FoldingInElixirWeb.FruitsLive.RowComponent}
+                  id={dom_id}
+                  customer={customer}
+                  dom_id={dom_id}
+                >
+                  <Table.table_cell>
+                    {customer.name}
+                  </Table.table_cell>
+                </.live_component>
+              </Table.table_row>
+            </Table.table_body>
+          </Table.table>
+        <% end %>
 
         <.modal
           :if={@live_action in [:new, :edit]}
@@ -81,9 +124,17 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
   def mount(_params, _session, socket) do
     customers = Repo.all(Customer)
 
-    dbg(customers)
+    {:ok,
+     socket
+     |> stream(
+       :customers,
+       customers
+     )}
+  end
 
-    {:ok, socket}
+  @impl true
+  def handle_info({:new_customer, customer}, socket) do
+    {:noreply, stream_insert(socket, :customers, customer)}
   end
 
   @impl true
@@ -111,7 +162,9 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
         customer_changeset = Market.change_customer(%Customer{}, complete_customer_data)
 
         case Repo.insert(customer_changeset) do
-          {:ok, _record} ->
+          {:ok, record} ->
+            send(self(), {:new_customer, record})
+
             {:noreply,
              socket
              |> push_patch(to: ~p"/fruits")
