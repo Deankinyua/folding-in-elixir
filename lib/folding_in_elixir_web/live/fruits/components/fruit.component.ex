@@ -136,10 +136,10 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
 
     new_count = count + 1
 
-    name = "product_" <> Integer.to_string(new_count) <> "_name"
-    quantity = "product_" <> Integer.to_string(new_count) <> "_quantity"
-    price = "product_" <> Integer.to_string(new_count) <> "_price"
-    total = "product_" <> Integer.to_string(new_count) <> "_total"
+    name = "fruit_" <> Integer.to_string(new_count) <> "_name"
+    quantity = "fruit_" <> Integer.to_string(new_count) <> "_quantity"
+    price = "fruit_" <> Integer.to_string(new_count) <> "_price"
+    total = "fruit_" <> Integer.to_string(new_count) <> "_total"
 
     new_fruit = %{
       id: new_count,
