@@ -68,6 +68,8 @@ defmodule FoldingInElixirWeb.FruitsLive.NameComponent do
 
           name_map = Map.merge(initial_name_map, changeset.changes)
 
+          dbg(name_map)
+
           send(self(), {:valid_name, name_map})
 
           :ok
@@ -96,8 +98,13 @@ defmodule FoldingInElixirWeb.FruitsLive.NameComponent do
      |> assign(form: form)}
   end
 
-  defp assign_form(socket) do
-    customer = %Customer{}
+  defp assign_form(%{assigns: %{customer: customer}} = socket) do
+    customer =
+      if customer == nil do
+        %Customer{}
+      else
+        customer
+      end
 
     socket = create_and_assign_form(socket, customer)
     socket

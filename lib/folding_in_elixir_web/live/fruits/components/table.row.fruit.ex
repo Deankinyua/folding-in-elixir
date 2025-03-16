@@ -16,7 +16,7 @@ defmodule FoldingInElixirWeb.FruitsLive.RowComponent do
           </Button.button>
 
           <Button.button>
-            <.link navigate={~p"/fruits/#{@customer}/edit"}>
+            <.link navigate={~p"/fruits/#{@customer.id}/edit"}>
               Edit Fruits
             </.link>
           </Button.button>

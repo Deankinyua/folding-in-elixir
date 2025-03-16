@@ -21,6 +21,8 @@ defmodule FoldingInElixirWeb.Router do
 
     live "/fruits", FruitsLive.Index, :index
     live "/fruits/new", FruitsLive.Index, :new
+    live "/fruits/:id/edit", FruitsLive.Index, :edit
+
     live "/fruits/:id", FruitsLive.Show, :show
   end
 

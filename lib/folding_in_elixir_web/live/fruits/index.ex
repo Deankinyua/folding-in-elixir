@@ -104,6 +104,7 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
             id="customer name form"
             title={@page_title}
             action={@live_action}
+            customer={@customer}
             patch={~p"/fruits"}
           />
 
@@ -111,6 +112,7 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
             module={FoldingInElixirWeb.FruitsLive.FruitComponent}
             id="fruits form"
             action={@live_action}
+            customer={@customer}
             patch={~p"/fruits"}
           />
         </.modal>
@@ -192,14 +194,18 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
     {:noreply, stream_delete(socket, :customers, customer)}
   end
 
-  defp apply_action(socket, :edit, _params) do
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    customer = Market.get_customer(id)
+
     socket
     |> assign(:page_title, "Edit Customer")
+    |> assign(:customer, customer)
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Customer")
+    |> assign(:customer, nil)
   end
 
   defp apply_action(socket, :index, _params) do
