@@ -134,7 +134,7 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
   end
 
   @impl true
-  def handle_info({:new_customer, customer}, socket) do
+  def handle_info({:customer, customer}, socket) do
     {:noreply, stream_insert(socket, :customers, customer)}
   end
 
@@ -146,37 +146,27 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
   end
 
   @impl true
-  def handle_info({:valid_fruit_details, fruit_details}, socket) do
+  def handle_info({:valid_fruit_details, details}, socket) do
+    {customer, fruit_details} = details
+
     fruit_details = delete_errors_key(fruit_details)
+
+    fruit_details = %{
+      fruits: fruit_details
+    }
 
     case Map.get(socket.assigns, :name_details) do
       nil ->
-        {:noreply, socket}
+        if customer != nil do
+          name_details = %{name: customer.name}
+
+          submit_details(customer, name_details, fruit_details, socket)
+        else
+          {:noreply, socket}
+        end
 
       name_details ->
-        fruit_details = %{
-          fruits: fruit_details
-        }
-
-        complete_customer_data = Map.merge(name_details, fruit_details)
-
-        customer_changeset = Market.change_customer(%Customer{}, complete_customer_data)
-
-        case Repo.insert(customer_changeset) do
-          {:ok, record} ->
-            send(self(), {:new_customer, record})
-
-            {:noreply,
-             socket
-             |> push_patch(to: ~p"/fruits")
-             |> put_flash(:info, "Customer was Successfully added")}
-
-          {:error, _changeset} ->
-            {:noreply,
-             socket
-             |> push_patch(to: ~p"/fruits")
-             |> put_flash(:error, "Customer Details were not Submitted!!")}
-        end
+        submit_details(customer, name_details, fruit_details, socket)
     end
   end
 
@@ -220,5 +210,49 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
       end)
 
     fruit_details
+  end
+
+  defp submit_details(customer, name_details, fruit_details, socket) do
+    complete_customer_data = Map.merge(name_details, fruit_details)
+
+    case customer == nil do
+      true ->
+        customer_changeset = Market.change_customer(%Customer{}, complete_customer_data)
+
+        case Repo.insert(customer_changeset) do
+          {:ok, record} ->
+            send(self(), {:customer, record})
+
+            {:noreply,
+             socket
+             |> push_patch(to: ~p"/fruits")
+             |> put_flash(:info, "Customer Details were successfully added")}
+
+          {:error, _changeset} ->
+            {:noreply,
+             socket
+             |> push_patch(to: ~p"/fruits")
+             |> put_flash(:error, "Customer Details were not submitted!!")}
+        end
+
+      false ->
+        customer_changeset = Market.change_customer(customer, complete_customer_data)
+
+        case Repo.update(customer_changeset) do
+          {:ok, record} ->
+            send(self(), {:customer, record})
+
+            {:noreply,
+             socket
+             |> push_patch(to: ~p"/fruits")
+             |> put_flash(:info, "Customer Details were successfully updated")}
+
+          {:error, _changeset} ->
+            {:noreply,
+             socket
+             |> push_patch(to: ~p"/fruits")
+             |> put_flash(:error, "Customer Details were not updated!!")}
+        end
+    end
   end
 end

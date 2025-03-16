@@ -114,7 +114,9 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
 
         case Enum.find(list_of_fruit_params, fn x -> x.errors == true end) do
           nil ->
-            send(self(), {:valid_fruit_details, list_of_fruit_params})
+            customer = socket.assigns.customer
+
+            send(self(), {:valid_fruit_details, {customer, list_of_fruit_params}})
 
             {:noreply,
              socket
@@ -151,6 +153,8 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
 
     # to append the new_fruit into our list
     new_fruits = fruits ++ [new_fruit]
+
+    dbg(new_fruits)
 
     {
       :noreply,
