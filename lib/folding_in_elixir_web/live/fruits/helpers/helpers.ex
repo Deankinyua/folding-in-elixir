@@ -121,7 +121,6 @@ defmodule FoldingInElixir.Helpers do
           true ->
             prefix = "fruit_#{count}_"
             key = String.replace_prefix(key, prefix, "")
-            # We need to include the count as part of our return value
             [{key, value} | list]
 
           false ->
