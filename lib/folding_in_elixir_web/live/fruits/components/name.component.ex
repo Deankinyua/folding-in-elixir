@@ -68,8 +68,6 @@ defmodule FoldingInElixirWeb.FruitsLive.NameComponent do
 
           name_map = Map.merge(initial_name_map, changeset.changes)
 
-          dbg(name_map)
-
           send(self(), {:valid_name, name_map})
 
           :ok

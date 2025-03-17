@@ -73,9 +73,11 @@ defmodule FoldingInElixir.Helpers do
       Enum.reduce(params, %{}, fn {key, value}, accumulator_map ->
         case String.starts_with?(key, "fruit_#{count}") do
           true ->
+            # the accumulator to be used in the next iteration
             Map.put(accumulator_map, key, value)
 
           false ->
+            # return the accumulator unchanged
             accumulator_map
         end
       end)

@@ -86,6 +86,7 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
   @impl true
   def handle_event("validate", %{"fruits" => fruit_params}, socket) do
     # * the main purpose of whatever is here is to offer feedback to the user
+
     fruit_count = socket.assigns.fruit_count
 
     fruit_params = remove_unused_fields(fruit_params)
@@ -153,8 +154,6 @@ defmodule FoldingInElixirWeb.FruitsLive.FruitComponent do
 
     # to append the new_fruit into our list
     new_fruits = fruits ++ [new_fruit]
-
-    dbg(new_fruits)
 
     {
       :noreply,
