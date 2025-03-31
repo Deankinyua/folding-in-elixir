@@ -53,6 +53,8 @@ defmodule FoldingInElixirWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
+      # * the Root layout is set in the browser pipeline throught the put_root_layout plug
+      # * the application layout is set here as you can see
         layout: {FoldingInElixirWeb.Layouts, :app}
 
       unquote(html_helpers())
