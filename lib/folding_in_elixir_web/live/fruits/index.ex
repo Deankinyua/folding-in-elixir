@@ -130,7 +130,7 @@ defmodule FoldingInElixirWeb.FruitsLive.Index do
      |> stream(
        :customers,
        customers
-     )}
+     ), layout: {FoldingInElixirWeb.Layouts, :root}}
   end
 
   @impl true
